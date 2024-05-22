@@ -12,10 +12,10 @@ export default class Game {
 
     next() {
         this.pointer++
-    }
 
-    playerWins() {
-        return this.pointer == demons.length
+        if (this.pointer > demons.length - 1) {
+            this.reset()
+        }
     }
 
     // https://stackoverflow.com/a/2450976
