@@ -2,8 +2,8 @@
     import Footer from "./Footer.svelte";
     import Header from "./Header.svelte";
 
-    export let score
-    export let highscore
+    export let score;
+    export let highscore;
 </script>
 
 <div
