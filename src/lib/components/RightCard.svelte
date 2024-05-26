@@ -7,7 +7,7 @@
     export let chooseHarder;
 </script>
 
-<div class="text-center text-white md:h-80">
+<div class="text-center text-white md:h-80 w-svw md:w-[50svw]">
     <p class="font-bold text-2xl md:text-5xl md:mb-2">"{name}"</p>
     <p class="italic text-xl md:text-2xl md:mb-5">{author}</p>
     <p class="text-lg my-2 md:mb-10">is</p>
