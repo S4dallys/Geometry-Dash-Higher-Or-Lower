@@ -1,116 +1,98 @@
 <script>
-    import Footer from "$lib/components/Footer.svelte";
-    import Header from "$lib/components/Header.svelte";
-    import Card from "$lib/components/Card.svelte";
-    import Button from "$lib/components/Button.svelte";
-
-    let score = 0;
-    let lost = false;
-    let highScore = 0;
-    $: highScore = Math.max(highScore, score);
+    import LeftCard from "$lib/components/LeftCard.svelte";
+    import RightCard from "$lib/components/RightCard.svelte";
+    import Overlay from "$lib/components/Overlay.svelte";
 
     export let data;
+    let controller = data.controller;
 
-    function getNext(reset) {
-        async function fetchNewData() {
-            const response = await fetch(`/api?reset=${reset}`);
-            data = await response.json();
-        }
+    // system variables
+    let lost = false;
+    let score = 0;
+    let highscore = 0;
 
-        fetchNewData();
+    // side effects
+    $: highscore = Math.max(highscore, score);
+    $: console.log(top, bottom);
+
+    let top;
+    let bottom;
+    let next;
+
+    function loadFirst() {
+        let newVals = controller.getFirst();
+        top = newVals.top;
+        bottom = newVals.bottom;
+        next = newVals.next;
     }
 
-    function chooseHarder() {
-        if (data.left.position > data.right.position) {
-            getNext();
-            score++
-            return;
-        }
-
-        lost = true;
-    }
-
-    function chooseEasier() {
-        if (data.left.position < data.right.position) {
-            getNext();
-            score++
-            return;
-        }
-
-        lost = true;
-    }
-
-    function resetGame() {
-        getNext(true);
-        lost = false;
+    function reset() {
+        controller.reset();
+        loadFirst();
         score = 0;
+        lost = false;
     }
+
+    function checkAnswer(val) {
+        if (val) {
+            top = bottom;
+            bottom = next;
+            next = controller.getNext();
+            score++;
+        } else {
+            lost = true;
+        }
+    }
+
+    loadFirst();
 </script>
 
-{#await data}
-    Loading...
-{:then d}
-    <div id="master" class="flex h-svh w-svw">
-        {#if lost == true}
-            <div
-                class="text-white bg-black flex flex-col justify-center items-center w-svw h-svh"
+<div class="container">
+    {#if lost}
+        <div
+            class="text-white bg-black flex flex-col justify-center items-center w-svw h-svh"
+        >
+            <h1 class="text-6xl">You lost!</h1>
+            <p class="text-4xl m-8">Score: {score}</p>
+            <button
+                class="mt-6 px-4 py-2 rounded-3xl hover:scale-125 hover:text-green-500 transition border-black border-2 bg-gray"
+                on:click={reset}>Try again?</button
             >
-                <h1 class="text-6xl">You lost!</h1>
-                <p class="text-4xl m-8">Score: {score}</p>
-                <button
-                    class="mt-6 px-4 py-2 rounded-3xl hover:scale-125 hover:text-green-500 transition border-black border-2 bg-gray"
-                    on:click={resetGame}>Try again?</button
-                >
-            </div>
-        {:else}
-            <Header />
-
-            <div class="flex justify-center items-start relative w-full">
-                <img
-                    class="absolute darken h-full object-cover"
-                    src={d.left.thumbnail}
-                    alt=""
-                />
-                <Card name={d.left.name} author={d.left.author}>
-                    <p class="text-yellow-200 text-6xl mt-8 font-bold">
-                        #{d.left.position}
-                    </p>
-                </Card>
-            </div>
-
+        </div>
+    {:else}
+        <Overlay {score} {highscore} />
+        <div
+            style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url({top.thumbnail}) center/cover no-repeat;"
+            class="h-1/2 w-full fixed top-0 md:h-full md:w-1/2 md:left-0"
+        >
             <div
-                class="absolute w-full h-full flex justify-center items-center"
+                class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
             >
-                <span
-                    class="w-24 h-24 p-4 text-4xl z-10 font-bold rounded-full bg-white flex justify-center items-center"
-                    >VS</span
-                >
-            </div>
-
-            <div class="flex justify-center items-start relative w-full">
-                <img
-                    class="absolute darken h-full object-cover"
-                    src={d.right.thumbnail}
-                    alt=""
+                <LeftCard
+                    name={top.name}
+                    author={top.author}
+                    position={top.position}
                 />
-                <Card name={d.right.name} author={d.right.author}>
-                    <Button role="harder" on:click={chooseHarder} />
-                    <Button role="easier" on:click={chooseEasier} />
-                </Card>
             </div>
-
-            <Footer {highScore} {score} />
-        {/if}
-    </div>
-{/await}
-
-<style lang="postcss">
-    @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
-
-    #master {
-        font-family: Montserrat, sans-serif;
-    }
-    .darken {
-        filter: brightness(40%);
-    }
-</style>
+        </div>
+        <div
+            style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url({bottom.thumbnail}) center/cover no-repeat;"
+            class="h-1/2 w-full fixed bottom-0 md:h-full md:w-1/2 md:right-0"
+        >
+            <div
+                class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
+            >
+                <RightCard
+                    name={bottom.name}
+                    author={bottom.author}
+                    chooseEasier={() => {
+                        checkAnswer(controller.isEasier());
+                    }}
+                    chooseHarder={() => {
+                        checkAnswer(controller.isHarder());
+                    }}
+                />
+            </div>
+        </div>
+    {/if}
+</div>

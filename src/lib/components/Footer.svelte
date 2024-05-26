@@ -1,13 +1,9 @@
 <script>
     export let score;
-    export let highScore;
+    export let highscore;
 </script>
 
-<div
-    class="absolute bottom-0 flex text-3xl font-bold justify-between p-8 w-full text-white"
->
-    <p>High Score: {highScore}</p>
+<div class="text-sm md:text-xl font-bold flex justify-between w-full">
+    <p>High Score: {highscore}</p>
     <p>Score: {score}</p>
 </div>
-
-<style lang="postcss"></style>

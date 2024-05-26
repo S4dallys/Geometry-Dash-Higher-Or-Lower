@@ -1,43 +1,13 @@
 <script>
-    export let role;
+    export let value;
+    export let icon;
+    export let handleClick;
 </script>
 
-{#if role === "harder"}
-    <button
-        class="rounded-full flex relative border-white border-2 w-60 px-10 py-4 pe-20 font-semibold text-3xl text-yellow-200 mt-10"
-        on:click
-        >Harder
-        <svg
-            class="absolute right-8 w-6 top-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-            ><path
-                fill="#ffffff"
-                d="M182.6 137.4c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-9.2 9.2-11.9 22.9-6.9 34.9s16.6 19.8 29.6 19.8H288c12.9 0 24.6-7.8 29.6-19.8s2.2-25.7-6.9-34.9l-128-128z"
-            /></svg
-        >
-    </button>
-{:else}
-    <button
-        class="rounded-full flex relative border-white border-2 w-60 px-10 py-4 pe-20 font-semibold text-3xl text-yellow-200 mt-6"
-        on:click
-        >Easier
-        <svg
-            class="absolute right-8 w-6 top-2"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-            ><path
-                fill="#ffffff"
-                d="M182.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-9.2-9.2-11.9-22.9-6.9-34.9s16.6-19.8 29.6-19.8H288c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-128 128z"
-            /></svg
-        >
-    </button>
-{/if}
-
-<style lang="postcss">
-button:hover {
-    background-color: white;
-    color: black;
-    transition: 0.1s ease-in;
-}
-</style>
+<button
+    class="border-white border-2 mx-auto w-[200px] text-yellow-200 hover:bg-white hover:text-black transition font-semibold px-10 py-5 text-sm md:text-lg h-10 rounded-full flex gap-3 items-center"
+    on:click={handleClick}
+>
+    <p class="w-20">{value}</p>
+    <img class="h-5 aspect-square" src={`/${icon}.png`} alt="" />
+</button>
