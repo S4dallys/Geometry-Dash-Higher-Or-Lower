@@ -13,7 +13,6 @@
 
     // side effects
     $: highscore = Math.max(highscore, score);
-    $: console.log(top, bottom);
 
     let top;
     let bottom;
