@@ -1,8 +1,16 @@
 import { demons } from './demons'
 
+demons.map(d => {
+    delete d.id
+    delete d.legacy
+    delete d.points
+    delete d.two_player
+    delete d.level_id
+})
+
 export default class Controller {
     constructor() {
-        this.demons = shuffle(demons)
+        this.demons = shuffle([...demons])
         this.pointer = 3
     }
 
@@ -35,8 +43,10 @@ export default class Controller {
     }
 
     reset() {
-        this.demons = shuffle(demons)
+        this.demons = shuffle(this.demons)
         this.pointer = 3
+
+        console.log(demons)
     }
 }
 

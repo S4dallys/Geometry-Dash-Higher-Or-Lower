@@ -1,22 +1,27 @@
 <script>
-    import LeftCard from "$lib/components/LeftCard.svelte";
-    import RightCard from "$lib/components/RightCard.svelte";
+    import LeftHalf from "../lib/components/LeftHalf.svelte";
+    import RightHalf from "../lib/components/RightHalf.svelte";
     import Overlay from "$lib/components/Overlay.svelte";
+    import Lost from "$lib/components/Lost.svelte";
 
     export let data;
     let controller = data.controller;
 
     // system variables
+    const transitionTime = 1500;
+    let showButtons = true;
+    let vs = true;
     let lost = false;
     let score = 0;
     let highscore = 0;
 
-    // side effects
-    $: highscore = Math.max(highscore, score);
-
+    // reactive
     let top;
     let bottom;
     let next;
+
+    // side effects
+    $: highscore = Math.max(highscore, score);
 
     function loadFirst() {
         let newVals = controller.getFirst();
@@ -30,68 +35,55 @@
         loadFirst();
         score = 0;
         lost = false;
+        showButtons = true;
+        vs = true;
     }
 
     function checkAnswer(val) {
+        showButtons = false;
+
         if (val) {
-            top = bottom;
-            bottom = next;
-            next = controller.getNext();
-            score++;
+            setTimeout(() => {
+                top = bottom;
+                bottom = next;
+                next = controller.getNext();
+                score++;
+                showButtons = true;
+            }, transitionTime);
         } else {
-            lost = true;
+            vs = false;
+            setTimeout(() => {
+                lost = true;
+            }, transitionTime + 500);
         }
+    }
+
+    function chooseEasier() {
+        checkAnswer(controller.isEasier());
+    }
+
+    function chooseHarder() {
+        checkAnswer(controller.isHarder());
     }
 
     loadFirst();
 </script>
 
-<div class="container">
+<div class="grid md:grid-cols-[50%,50%] w-svw h-svh overflow-hidden">
     {#if lost}
-        <div
-            class="text-white bg-black flex flex-col justify-center items-center w-svw h-svh"
-        >
-            <h1 class="text-6xl">You lost!</h1>
-            <p class="text-4xl m-8">Score: {score}</p>
-            <button
-                class="mt-6 px-4 py-2 rounded-3xl hover:scale-125 hover:text-green-500 transition border-black border-2 bg-gray"
-                on:click={reset}>Try again?</button
-            >
-        </div>
+        <Lost {score} {reset} />
     {:else}
-        <Overlay {score} {highscore} />
-        <div
-            style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url({top.thumbnail}) center/cover no-repeat;"
-            class="h-1/2 w-full fixed top-0 md:h-full md:w-1/2 md:left-0"
-        >
-            <div
-                class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
-            >
-                <LeftCard
-                    name={top.name}
-                    author={top.author}
-                    position={top.position}
-                />
-            </div>
-        </div>
-        <div
-            style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url({bottom.thumbnail}) center/cover no-repeat;"
-            class="h-1/2 w-full fixed bottom-0 md:h-full md:w-1/2 md:right-0"
-        >
-            <div
-                class="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]"
-            >
-                <RightCard
-                    name={bottom.name}
-                    author={bottom.author}
-                    chooseEasier={() => {
-                        checkAnswer(controller.isEasier());
-                    }}
-                    chooseHarder={() => {
-                        checkAnswer(controller.isHarder());
-                    }}
-                />
-            </div>
-        </div>
+        <Overlay {score} {highscore} {vs} />
+        <LeftHalf {...top} />
+        {#if showButtons}
+            <RightHalf
+                {...bottom}
+                {chooseEasier}
+                {chooseHarder}
+            />
+        {:else}
+            <LeftHalf {...bottom} />
+        {/if}
+        <RightHalf {...next} {chooseEasier} {chooseHarder} />
     {/if}
 </div>
