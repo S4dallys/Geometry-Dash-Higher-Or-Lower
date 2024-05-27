@@ -14,6 +14,16 @@ export default class Controller {
         this.pointer = 3
     }
 
+    useTop150() {
+        this.demons = demons.slice(0, 150)
+        this.reset()
+    }
+
+    dontUseTop150() {
+        this.demons = [...demons]
+        this.reset()
+    }
+
     getFirst() {
         let data = {
             top: this.demons[0],
@@ -27,7 +37,7 @@ export default class Controller {
     getNext() {
         let data = this.demons[this.pointer]
 
-        this.pointer++
+        this.pointer = (this.pointer + 1) % this.demons.length
 
         return data
     }
@@ -45,8 +55,6 @@ export default class Controller {
     reset() {
         this.demons = shuffle(this.demons)
         this.pointer = 3
-
-        console.log(demons)
     }
 }
 
