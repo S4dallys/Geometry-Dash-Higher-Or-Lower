@@ -4,8 +4,13 @@
     import Overlay from "$lib/components/Overlay.svelte";
     import Lost from "$lib/components/Lost.svelte";
 
+    // load
     export let data;
     let controller = data.controller;
+    let variables = data.variables;
+
+    // cookies
+    let { highscore, highscore150, isTop150 } = variables;
 
     // system variables
     const transitionTime = 1500;
@@ -13,7 +18,6 @@
     let vs = true;
     let lost = false;
     let score = 0;
-    let highscore = 0;
 
     // reactive
     let top;
@@ -21,7 +25,13 @@
     let next;
 
     // side effects
-    $: highscore = Math.max(highscore, score);
+    $: if (isTop150) {
+        controller.useTop150();
+        reset();
+    } else {
+        controller.dontUseTop150();
+        reset();
+    }
 
     function loadFirst() {
         let newVals = controller.getFirst();
@@ -31,6 +41,12 @@
     }
 
     function reset() {
+        if (isTop150) {
+            highscore150 = Math.max(highscore150, score);
+        } else {
+            highscore = Math.max(highscore, score);
+        }
+
         controller.reset();
         loadFirst();
         score = 0;
@@ -54,7 +70,7 @@
             vs = false;
             setTimeout(() => {
                 lost = true;
-            }, transitionTime + 500);
+            }, transitionTime);
         }
     }
 
@@ -65,25 +81,34 @@
     function chooseHarder() {
         checkAnswer(controller.isHarder());
     }
-
     loadFirst();
 </script>
 
-<div class="grid md:grid-cols-[50%,50%] w-svw h-svh overflow-hidden">
+<div
+    class="grid grid-rows-[50svh] grid-cols-1 md:grid-rows-1 md:grid-cols-[50%,50%,50%] w-svw h-svh overflow-hidden"
+>
     {#if lost}
         <Lost {score} {reset} />
     {:else}
-        <Overlay {score} {highscore} {vs} />
-        <LeftHalf {...top} />
-        {#if showButtons}
-            <RightHalf
-                {...bottom}
-                {chooseEasier}
-                {chooseHarder}
-            />
-        {:else}
-            <LeftHalf {...bottom} />
-        {/if}
-        <RightHalf {...next} {chooseEasier} {chooseHarder} />
+        <Overlay {score} {highscore} {highscore150} {vs} bind:isTop150 />
+
+        <!-- top -->
+        <div>
+            <LeftHalf {...top} />
+        </div>
+
+        <!-- bottom -->
+        <div>
+            {#if showButtons}
+                <RightHalf {...bottom} {chooseEasier} {chooseHarder} />
+            {:else}
+                <LeftHalf {...bottom} />
+            {/if}
+        </div>
+
+        <!-- next -->
+        <div>
+            <RightHalf {...next} {chooseEasier} {chooseHarder} />
+        </div>
     {/if}
 </div>

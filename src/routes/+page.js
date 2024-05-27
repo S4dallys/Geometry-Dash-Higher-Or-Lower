@@ -1,6 +1,6 @@
 import Controller from './controller'
 
 export const ssr = false;
-export function load()  {
-    return { controller: new Controller() }
+export function load({ data }) {
+    return { controller: new Controller(), variables: data }
 }

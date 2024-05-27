@@ -1,7 +1,5 @@
 # Play [here](https://geometry-dash-higher-or-lower.vercel.app/) :)
 
-Used only sveltekit and tailwind (PAIN)  
-Took a whole day smh
-
-TODO: Make it mobile responsive
+If someone can tell me how to do the slide transition with svelte, where the right side slides to the left, I would be very happy. But for now, I am finished!!
+Made with Sveltekit and Tailwind. [date]
 
