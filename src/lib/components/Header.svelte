@@ -3,5 +3,5 @@
         data sourced from
         <a class="underline" href="http://aredl.net">Aredl.net</a>
     </p>
-    <p>last updated: 5/22/24</p>
+    <p>last updated: 8/30/24</p>
 </div>
